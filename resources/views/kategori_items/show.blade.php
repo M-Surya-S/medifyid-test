@@ -11,6 +11,10 @@
                 <div class="card">
                     <div class="card-header">Kategori Item</div>
                     <div class="card-body">
+                        @if (session('success'))
+                            <div class="alert alert-success">{{ session('success') }}</div>
+                        @endif
+
                         <table class="table table-borderless mb-4">
                             <tr>
                                 <th style="width: 180px">Kode Kategori</th>
@@ -21,6 +25,14 @@
                                 <td>{{ $kategoriItem->nama }}</td>
                             </tr>
                         </table>
+
+                        <a class="btn btn-info" href="{{ route('kategori-items.edit', ['kategoriItem' => $kategoriItem->id, 'return_to' => url()->current()]) }}">Edit</a>
+                        <form method="POST" action="{{ route('kategori-items.destroy', $kategoriItem) }}" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus kategori ini?');">
+                            @csrf
+                            @method('DELETE')
+                            <input type="hidden" name="return_to" value="{{ route('kategori-items.index') }}">
+                            <button class="btn btn-danger">Delete</button>
+                        </form>
 
                         <h5>Daftar Master Item</h5>
                         <div class="table-responsive">

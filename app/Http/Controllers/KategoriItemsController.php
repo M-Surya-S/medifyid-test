@@ -32,6 +32,15 @@ class KategoriItemsController extends Controller
         return view('kategori_items.create', compact('returnTo'));
     }
 
+    public function edit(Request $request, KategoriItem $kategoriItem)
+    {
+        $returnTo = $request->filled('return_to')
+            ? $request->input('return_to')
+            : route('kategori-items.show', $kategoriItem);
+
+        return view('kategori_items.edit', compact('kategoriItem', 'returnTo'));
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -63,13 +72,29 @@ class KategoriItemsController extends Controller
 
         $kategoriItem->update(['nama' => $validated['nama']]);
 
-        return redirect()->route('kategori-items.index')
+        $returnTo = $request->input('return_to');
+        $appUrl = rtrim(url('/'), '/');
+
+        if ($returnTo && str_starts_with($returnTo, $appUrl . '/')) {
+            return redirect($returnTo)
+                ->with('success', 'Kategori berhasil diperbarui.');
+        }
+
+        return redirect()->route('kategori-items.show', $kategoriItem)
             ->with('success', 'Kategori berhasil diperbarui.');
     }
 
-    public function destroy(KategoriItem $kategoriItem)
+    public function destroy(Request $request, KategoriItem $kategoriItem)
     {
         $kategoriItem->delete();
+
+        $returnTo = $request->input('return_to');
+        $appUrl = rtrim(url('/'), '/');
+
+        if ($returnTo && str_starts_with($returnTo, $appUrl . '/')) {
+            return redirect($returnTo)
+                ->with('success', 'Kategori berhasil dihapus.');
+        }
 
         return redirect()->route('kategori-items.index')
             ->with('success', 'Kategori berhasil dihapus.');
