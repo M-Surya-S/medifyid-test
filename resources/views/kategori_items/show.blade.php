@@ -26,8 +26,12 @@
                             </tr>
                         </table>
 
-                        <a class="btn btn-info" href="{{ route('kategori-items.edit', ['kategoriItem' => $kategoriItem->id, 'return_to' => url()->current()]) }}">Edit</a>
-                        <form method="POST" action="{{ route('kategori-items.destroy', $kategoriItem) }}" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus kategori ini?');">
+                        <a class="btn btn-info"
+                            href="{{ route('kategori-items.edit', ['kategoriItem' => $kategoriItem->id, 'return_to' => url()->current()]) }}">Edit</a>
+                        <a class="btn btn-secondary" href="{{ route('kategori-items.print', $kategoriItem) }}">Download
+                            PDF</a>
+                        <form method="POST" action="{{ route('kategori-items.destroy', $kategoriItem) }}" class="d-inline"
+                            onsubmit="return confirm('Yakin ingin menghapus kategori ini?');">
                             @csrf
                             @method('DELETE')
                             <input type="hidden" name="return_to" value="{{ route('kategori-items.index') }}">
