@@ -5,7 +5,7 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="form-group mb-2">
-                    <a href="{{ route('kategori-items.create') }}" class="btn btn-secondary">+ Kategori Item Baru</a>
+                    <a href="{{ route('kategori-items.create', ['return_to' => url()->current()]) }}" class="btn btn-secondary">+ Kategori Item Baru</a>
                 </div>
 
                 <div class="card">

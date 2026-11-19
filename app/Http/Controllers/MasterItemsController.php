@@ -52,16 +52,17 @@ class MasterItemsController extends Controller
         $data['item'] = $item;
         $data['method'] = $method;
         $data['kategoriItems'] = KategoriItem::orderBy('nama')->get();
-        $data['selectedKategoriIds'] = $method == 'edit'
-            ? $item->kategoriItems()->pluck('kategori_items.id')->toArray()
-            : [];
+        $data['selectedKategoriId'] = $method == 'edit'
+            ? $item->kategoriItems()->value('kategori_items.id')
+            : null;
 
         return view('master_items.form.index', $data);
     }
 
-    public function singleView($kode)
+    public function singleView(Request $request, $kode)
     {
         $data['data'] = MasterItem::where('kode', $kode)->first();
+        $data['returnTo'] = $request->input('return_to', url('master-items'));
         return view('master_items.single.index', $data);
     }
 
@@ -74,26 +75,18 @@ class MasterItemsController extends Controller
             'supplier' => ['required', 'string', 'max:255'],
             'jenis' => ['required', 'string', 'max:255'],
             'gambar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'kategori_ids' => ['nullable', 'array'],
-            'kategori_ids.*' => ['integer', 'exists:kategori_items,id'],
-            'kategori_baru_nama' => ['nullable', 'string', 'max:255'],
+            'kategori_id' => ['nullable', 'integer', 'exists:kategori_items,id'],
         ]);
 
         if ($method == 'new') {
             $data_item = new MasterItem;
-            $kode = MasterItem::count('id');
-            $kode = $kode + 1;
-            $kode = str_pad($kode, 5, '0', STR_PAD_LEFT);
-            sleep(3);
         } else {
             $data_item = MasterItem::findOrFail($id);
-            $kode = $data_item->kode;
         }
 
         $data_item->nama = $validated['nama'];
         $data_item->harga_beli = $validated['harga_beli'];
         $data_item->laba = $validated['laba'];
-        $data_item->kode = $kode;
         $data_item->supplier = $validated['supplier'];
         $data_item->jenis = $validated['jenis'];
 
@@ -110,29 +103,13 @@ class MasterItemsController extends Controller
             $data_item->save();
         }
 
-        $kategoriIds = $request->input('kategori_ids', []);
+        $kategoriIds = $request->filled('kategori_id')
+            ? [$request->input('kategori_id')]
+            : [];
 
-        if ($request->filled('kategori_baru_nama')) {
-            $kategoriBaru = KategoriItem::create([
-                'nama' => $validated['kategori_baru_nama'],
-                'kode' => $this->generateKategoriKode(),
-            ]);
-            $kategoriIds[] = $kategoriBaru->id;
-        }
-
-        $data_item->kategoriItems()->sync(array_unique($kategoriIds));
+        $data_item->kategoriItems()->sync($kategoriIds);
 
         return redirect('master-items');
-    }
-
-    private function generateKategoriKode()
-    {
-        do {
-            $next = KategoriItem::count() + 1;
-            $kode = 'KAT' . str_pad((string) $next, 5, '0', STR_PAD_LEFT);
-        } while (KategoriItem::where('kode', $kode)->exists());
-
-        return $kode;
     }
 
     public function delete($id)

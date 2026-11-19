@@ -43,7 +43,7 @@
                                             <td>{{ number_format($item->harga_beli, 0, ',', '.') }}</td>
                                             <td>
                                                 <a class="btn btn-sm btn-primary"
-                                                    href="{{ url('master-items/view/' . $item->kode) }}">View</a>
+                                                    href="{{ url('master-items/view/' . $item->kode) . '?return_to=' . urlencode(url()->current()) }}">View</a>
                                             </td>
                                         </tr>
                                     @empty

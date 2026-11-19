@@ -14,31 +14,19 @@
 
     <div class="form-group">
         <label>Kategori Item</label>
-        @if ($kategoriItems->isEmpty())
-            <p class="text-muted">Belum ada kategori.</p>
-        @else
-            @foreach ($kategoriItems as $kategori)
-                <div class="form-check">
-                    <input type="checkbox" class="form-check-input" name="kategori_ids[]" value="{{ $kategori->id }}"
-                        id="kategori-{{ $kategori->id }}"
-                        @if (in_array($kategori->id, $selectedKategoriIds)) checked @endif>
-                    <label class="form-check-label" for="kategori-{{ $kategori->id }}">
+        <div class="d-flex gap-2">
+            <select class="form-control" name="kategori_id">
+                <option value="">--Pilih--</option>
+                @foreach ($kategoriItems as $kategori)
+                    <option value="{{ $kategori->id }}"
+                        @if ($kategori->id == $selectedKategoriId) selected @endif>
                         {{ $kategori->kode }} - {{ $kategori->nama }}
-                    </label>
-                </div>
-            @endforeach
-        @endif
-        @error('kategori_ids')
-            <small class="text-danger">{{ $message }}</small>
-        @enderror
-    </div>
-
-    <div class="form-group mt-3">
-        <label>Buat Kategori Baru</label>
-        <input type="text" class="form-control" name="kategori_baru_nama"
-            value="{{ old('kategori_baru_nama') }}"
-            placeholder="Nama kategori baru">
-        @error('kategori_baru_nama')
+                    </option>
+                @endforeach
+            </select>
+            <a href="{{ route('kategori-items.create', ['return_to' => url()->current()]) }}" class="btn btn-secondary" style="white-space: nowrap">+ Kategori</a>
+        </div>
+        @error('kategori_id')
             <small class="text-danger">{{ $message }}</small>
         @enderror
     </div>

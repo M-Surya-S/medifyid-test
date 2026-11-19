@@ -23,9 +23,13 @@ class KategoriItemsController extends Controller
         return view('kategori_items.index', compact('kategoriItems'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        return view('kategori_items.create');
+        $returnTo = $request->filled('return_to')
+            ? $request->input('return_to')
+            : url()->previous();
+
+        return view('kategori_items.create', compact('returnTo'));
     }
 
     public function store(Request $request)
@@ -38,6 +42,14 @@ class KategoriItemsController extends Controller
             'nama' => $validated['nama'],
             'kode' => $this->generateKode(),
         ]);
+
+        $returnTo = $request->input('return_to');
+        $appUrl = rtrim(url('/'), '/');
+
+        if ($returnTo && str_starts_with($returnTo, $appUrl . '/')) {
+            return redirect($returnTo)
+                ->with('success', 'Kategori berhasil ditambahkan.');
+        }
 
         return redirect()->route('kategori-items.index')
             ->with('success', 'Kategori berhasil ditambahkan.');
