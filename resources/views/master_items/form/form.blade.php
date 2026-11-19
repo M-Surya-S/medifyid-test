@@ -13,6 +13,45 @@
     </div>
 
     <div class="form-group">
+        <label>Kategori Item</label>
+        @if ($kategoriItems->isEmpty())
+            <p class="text-muted">Belum ada kategori.</p>
+        @else
+            @foreach ($kategoriItems as $kategori)
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" name="kategori_ids[]" value="{{ $kategori->id }}"
+                        id="kategori-{{ $kategori->id }}"
+                        @if (in_array($kategori->id, $selectedKategoriIds)) checked @endif>
+                    <label class="form-check-label" for="kategori-{{ $kategori->id }}">
+                        {{ $kategori->kode }} - {{ $kategori->nama }}
+                    </label>
+                </div>
+            @endforeach
+        @endif
+        @error('kategori_ids')
+            <small class="text-danger">{{ $message }}</small>
+        @enderror
+    </div>
+
+    <div class="form-group mt-3">
+        <label>Buat Kategori Baru</label>
+        <div class="row">
+            <div class="col-md-6">
+                <input type="text" class="form-control" name="kategori_baru_kode" value="{{ old('kategori_baru_kode') }}" placeholder="Kode kategori">
+            </div>
+            <div class="col-md-6">
+                <input type="text" class="form-control" name="kategori_baru_nama" value="{{ old('kategori_baru_nama') }}" placeholder="Nama kategori">
+            </div>
+        </div>
+        @error('kategori_baru_kode')
+            <small class="text-danger">{{ $message }}</small>
+        @enderror
+        @error('kategori_baru_nama')
+            <small class="text-danger">{{ $message }}</small>
+        @enderror
+    </div>
+
+    <div class="form-group">
         <label>Gambar</label>
         <input type="file" class="form-control" name="gambar" accept="image/jpeg,image/png,image/webp">
         @if ($method == 'edit' && !empty($item->gambar))

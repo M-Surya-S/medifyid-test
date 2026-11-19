@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\KategoriItem;
 use App\Models\MasterItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -43,12 +44,18 @@ class MasterItemsController extends Controller
     public function formView($method, $id = 0)
     {
         if ($method == 'new') {
-            $item = [];
+            $item = new MasterItem;
         } else {
-            $item = MasterItem::find($id);
+            $item = MasterItem::findOrFail($id);
         }
+
         $data['item'] = $item;
         $data['method'] = $method;
+        $data['kategoriItems'] = KategoriItem::orderBy('nama')->get();
+        $data['selectedKategoriIds'] = $method == 'edit'
+            ? $item->kategoriItems()->pluck('kategori_items.id')->toArray()
+            : [];
+
         return view('master_items.form.index', $data);
     }
 
@@ -67,6 +74,10 @@ class MasterItemsController extends Controller
             'supplier' => ['required', 'string', 'max:255'],
             'jenis' => ['required', 'string', 'max:255'],
             'gambar' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'kategori_ids' => ['nullable', 'array'],
+            'kategori_ids.*' => ['integer', 'exists:kategori_items,id'],
+            'kategori_baru_nama' => ['nullable', 'required_with:kategori_baru_kode', 'string', 'max:255'],
+            'kategori_baru_kode' => ['nullable', 'required_with:kategori_baru_nama', 'string', 'max:255', 'unique:kategori_items,kode'],
         ]);
 
         if ($method == 'new') {
@@ -99,6 +110,18 @@ class MasterItemsController extends Controller
         } else {
             $data_item->save();
         }
+
+        $kategoriIds = $request->input('kategori_ids', []);
+
+        if ($request->filled('kategori_baru_nama') && $request->filled('kategori_baru_kode')) {
+            $kategoriBaru = KategoriItem::create([
+                'nama' => $validated['kategori_baru_nama'],
+                'kode' => $validated['kategori_baru_kode'],
+            ]);
+            $kategoriIds[] = $kategoriBaru->id;
+        }
+
+        $data_item->kategoriItems()->sync(array_unique($kategoriIds));
 
         return redirect('master-items');
     }
