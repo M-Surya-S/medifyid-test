@@ -10,4 +10,24 @@ class MasterItem extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
+    protected $fillable = [
+        'kode',
+        'nama',
+        'harga_beli',
+        'laba',
+        'supplier',
+        'jenis',
+        'gambar',
+    ];
+
+    public function kategoriItems()
+    {
+        return $this->belongsToMany(
+            KategoriItem::class,
+            'kategori_item_master_item',
+            'master_item_id',
+            'kategori_item_id'
+        );
+    }
 }
