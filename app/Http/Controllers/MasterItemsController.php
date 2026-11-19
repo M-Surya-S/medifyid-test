@@ -73,11 +73,10 @@ class MasterItemsController extends Controller
             'laba' => ['required', 'integer', 'min:0'],
             'supplier' => ['required', 'string', 'max:255'],
             'jenis' => ['required', 'string', 'max:255'],
-            'gambar' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'gambar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'kategori_ids' => ['nullable', 'array'],
             'kategori_ids.*' => ['integer', 'exists:kategori_items,id'],
-            'kategori_baru_nama' => ['nullable', 'required_with:kategori_baru_kode', 'string', 'max:255'],
-            'kategori_baru_kode' => ['nullable', 'required_with:kategori_baru_nama', 'string', 'max:255', 'unique:kategori_items,kode'],
+            'kategori_baru_nama' => ['nullable', 'string', 'max:255'],
         ]);
 
         if ($method == 'new') {
@@ -113,10 +112,10 @@ class MasterItemsController extends Controller
 
         $kategoriIds = $request->input('kategori_ids', []);
 
-        if ($request->filled('kategori_baru_nama') && $request->filled('kategori_baru_kode')) {
+        if ($request->filled('kategori_baru_nama')) {
             $kategoriBaru = KategoriItem::create([
                 'nama' => $validated['kategori_baru_nama'],
-                'kode' => $validated['kategori_baru_kode'],
+                'kode' => $this->generateKategoriKode(),
             ]);
             $kategoriIds[] = $kategoriBaru->id;
         }
@@ -124,6 +123,16 @@ class MasterItemsController extends Controller
         $data_item->kategoriItems()->sync(array_unique($kategoriIds));
 
         return redirect('master-items');
+    }
+
+    private function generateKategoriKode()
+    {
+        do {
+            $next = KategoriItem::count() + 1;
+            $kode = 'KAT' . str_pad((string) $next, 5, '0', STR_PAD_LEFT);
+        } while (KategoriItem::where('kode', $kode)->exists());
+
+        return $kode;
     }
 
     public function delete($id)
@@ -141,13 +150,12 @@ class MasterItemsController extends Controller
     public function updateRandomData()
     {
         $data = MasterItem::get();
-        foreach($data as $item)
-        {
+        foreach ($data as $item) {
             $kode = $item->id;
             $kode = str_pad($kode, 5, '0', STR_PAD_LEFT);
 
-            $item->harga_beli = rand(100,1000000);
-            $item->laba = rand(10,99);
+            $item->harga_beli = rand(100, 1000000);
+            $item->laba = rand(10, 99);
             $item->kode = $kode;
             $item->supplier = $this->getRandomSupplier();
             $item->jenis = $this->getRandomJenis();
@@ -157,15 +165,15 @@ class MasterItemsController extends Controller
 
     private function getRandomSupplier()
     {
-        $array = ['Tokopaedi','Bukulapuk','TokoBagas','E Commurz','Blublu'];
-        $random = rand(0,4);
+        $array = ['Tokopaedi', 'Bukulapuk', 'TokoBagas', 'E Commurz', 'Blublu'];
+        $random = rand(0, 4);
         return $array[$random];
     }
 
     private function getRandomJenis()
     {
-        $array = ['Obat','Alkes','Matkes','Umum','ATK'];
-        $random = rand(0,4);
+        $array = ['Obat', 'Alkes', 'Matkes', 'Umum', 'ATK'];
+        $random = rand(0, 4);
         return $array[$random];
     }
 }

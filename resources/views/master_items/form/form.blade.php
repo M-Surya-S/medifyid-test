@@ -35,17 +35,9 @@
 
     <div class="form-group mt-3">
         <label>Buat Kategori Baru</label>
-        <div class="row">
-            <div class="col-md-6">
-                <input type="text" class="form-control" name="kategori_baru_kode" value="{{ old('kategori_baru_kode') }}" placeholder="Kode kategori">
-            </div>
-            <div class="col-md-6">
-                <input type="text" class="form-control" name="kategori_baru_nama" value="{{ old('kategori_baru_nama') }}" placeholder="Nama kategori">
-            </div>
-        </div>
-        @error('kategori_baru_kode')
-            <small class="text-danger">{{ $message }}</small>
-        @enderror
+        <input type="text" class="form-control" name="kategori_baru_nama"
+            value="{{ old('kategori_baru_nama') }}"
+            placeholder="Nama kategori baru">
         @error('kategori_baru_nama')
             <small class="text-danger">{{ $message }}</small>
         @enderror
