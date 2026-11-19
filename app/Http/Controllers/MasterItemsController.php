@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MasterItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class MasterItemsController extends Controller
 {
@@ -54,6 +55,15 @@ class MasterItemsController extends Controller
 
     public function formSubmit(Request $request, $method, $id = 0)
     {
+        $validated = $request->validate([
+            'nama' => ['required', 'string', 'max:255'],
+            'harga_beli' => ['required', 'integer', 'min:0'],
+            'laba' => ['required', 'integer', 'min:0'],
+            'supplier' => ['required', 'string', 'max:255'],
+            'jenis' => ['required', 'string', 'max:255'],
+            'gambar' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ]);
+
         if ($method == 'new') {
             $data_item = new MasterItem;
             $kode = MasterItem::count('id');
@@ -61,24 +71,42 @@ class MasterItemsController extends Controller
             $kode = str_pad($kode, 5, '0', STR_PAD_LEFT);
             sleep(3);
         } else {
-            $data_item = MasterItem::find($id);
+            $data_item = MasterItem::findOrFail($id);
             $kode = $data_item->kode;
         }
 
-        $data_item->nama = $request->nama;
-        $data_item->harga_beli = $request->harga_beli;
-        $data_item->laba = $request->laba;
+        $data_item->nama = $validated['nama'];
+        $data_item->harga_beli = $validated['harga_beli'];
+        $data_item->laba = $validated['laba'];
         $data_item->kode = $kode;
-        $data_item->supplier = $request->supplier;
-        $data_item->jenis = $request->jenis;
-        $data_item->save();
+        $data_item->supplier = $validated['supplier'];
+        $data_item->jenis = $validated['jenis'];
+
+        if ($request->hasFile('gambar')) {
+            $oldImage = $data_item->gambar;
+            $path = $request->file('gambar')->store('master-items', 'public');
+            $data_item->gambar = $path;
+            $data_item->save();
+
+            if ($oldImage && $oldImage !== $path) {
+                Storage::disk('public')->delete($oldImage);
+            }
+        } else {
+            $data_item->save();
+        }
 
         return redirect('master-items');
     }
 
     public function delete($id)
     {
-        MasterItem::find($id)->delete();
+        $item = MasterItem::findOrFail($id);
+
+        if ($item->gambar) {
+            Storage::disk('public')->delete($item->gambar);
+        }
+
+        $item->delete();
         return redirect('master-items');
     }
 

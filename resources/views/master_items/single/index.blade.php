@@ -13,6 +13,17 @@
                 <div class="card-body">
                     <table>
                         <tr>
+                            <th>Gambar</th>
+                            <td>:</td>
+                            <td>
+                                @if ($data->gambar)
+                                    <img src="{{ asset('storage/' . $data->gambar) }}" alt="Gambar {{ $data->nama }}" style="max-width: 300px; max-height: 300px; object-fit: contain;">
+                                @else
+                                    <span class="text-muted">Tidak ada gambar</span>
+                                @endif
+                            </td>
+                        </tr>
+                        <tr>
                             <th>Nama</th>
                             <td>:</td>
                             <td>{{$data->nama}}</td>
