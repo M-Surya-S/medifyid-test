@@ -61,7 +61,7 @@ class MasterItemsController extends Controller
 
     public function singleView(Request $request, $kode)
     {
-        $data['data'] = MasterItem::where('kode', $kode)->first();
+        $data['data'] = MasterItem::with('kategoriItems')->where('kode', $kode)->firstOrFail();
         $data['returnTo'] = $request->input('return_to', url('master-items'));
         return view('master_items.single.index', $data);
     }
