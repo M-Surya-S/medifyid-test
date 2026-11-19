@@ -35,6 +35,7 @@ Route::get('/master-items/update-random-data', [App\Http\Controllers\MasterItems
 Route::get('/kategori-items', [App\Http\Controllers\KategoriItemsController::class, 'index'])->name('kategori-items.index');
 Route::get('/kategori-items/create', [App\Http\Controllers\KategoriItemsController::class, 'create'])->name('kategori-items.create');
 Route::get('/kategori-items/{kategoriItem}/edit', [App\Http\Controllers\KategoriItemsController::class, 'edit'])->name('kategori-items.edit');
+Route::get('/kategori-items/{kategoriItem}/print', [App\Http\Controllers\KategoriItemsController::class, 'exportPdf'])->name('kategori-items.print');
 Route::post('/kategori-items', [App\Http\Controllers\KategoriItemsController::class, 'store'])->name('kategori-items.store');
 Route::put('/kategori-items/{kategoriItem}', [App\Http\Controllers\KategoriItemsController::class, 'update'])->name('kategori-items.update');
 Route::delete('/kategori-items/{kategoriItem}', [App\Http\Controllers\KategoriItemsController::class, 'destroy'])->name('kategori-items.destroy');

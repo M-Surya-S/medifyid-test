@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\KategoriItem;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class KategoriItemsController extends Controller
@@ -107,6 +108,23 @@ class KategoriItemsController extends Controller
         }]);
 
         return view('kategori_items.show', compact('kategoriItem'));
+    }
+
+    public function exportPdf(KategoriItem $kategoriItem)
+    {
+        $kategoriItem->load(['masterItems' => function ($query) {
+            $query->orderBy('kode');
+        }]);
+
+        $printedAt = now();
+        $filename = 'kategori-' . strtolower($kategoriItem->kode) . '.pdf';
+
+        $pdf = Pdf::loadView('kategori_items.pdf', [
+            'kategoriItem' => $kategoriItem,
+            'printedAt' => $printedAt,
+        ]);
+
+        return $pdf->download($filename);
     }
 
     private function generateKode()
