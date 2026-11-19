@@ -53,27 +53,11 @@
                                     @forelse ($kategoriItems as $kategori)
                                         <tr>
                                             <td>{{ $kategori->kode }}</td>
-                                            <td>
-                                                <form method="POST"
-                                                    action="{{ route('kategori-items.update', $kategori) }}" class="d-flex">
-                                                    @csrf
-                                                    @method('PUT')
-                                                    <input type="text" class="form-control form-control-sm me-2"
-                                                        name="nama" value="{{ $kategori->nama }}" required>
-                                                    <button class="btn btn-sm btn-warning">Simpan</button>
-                                                </form>
-                                            </td>
+                                            <td>{{ $kategori->nama }}</td>
                                             <td>{{ $kategori->master_items_count }}</td>
                                             <td>
-                                                <a class="btn btn-primary btn-sm"
+                                                <a class="btn btn-primary"
                                                     href="{{ route('kategori-items.show', $kategori) }}">View</a>
-                                                <form method="POST"
-                                                    action="{{ route('kategori-items.destroy', $kategori) }}"
-                                                    class="d-inline" onsubmit="return confirm('Hapus kategori ini?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button class="btn btn-sm btn-danger">Delete</button>
-                                                </form>
                                             </td>
                                         </tr>
                                     @empty
@@ -89,4 +73,18 @@
             </div>
         </div>
     </div>
+@endsection
+
+@section('js')
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#table').DataTable({
+            searching: false,
+            order: [[0, 'desc']],
+        });
+    });
+</script>
 @endsection
